@@ -1,3 +1,4 @@
+# Replace this file in your Flutter project root (do NOT include .env in assets)
 name: dentistify
 description: "A new Flutter project."
 publish_to: 'none'
@@ -28,7 +29,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Add this:
   assets:
-    - .env
     - assets/icons/

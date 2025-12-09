@@ -1,3 +1,6 @@
+// Replace lib/pages/transport/map_page.dart with this fixed variant.
+// Main fixes: use mp.CameraOptions in MapWidget; keep other logic as-is.
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -25,7 +28,6 @@ class _MapPageState extends State<MapPage> {
   StreamSubscription? userPositionStream;
   bool _isNight = false;
 
-  // Backend client that will call your secure backend (which holds API keys)
   late final TransportClient _transportClient;
 
   Timer? _pollingTimer;
@@ -139,7 +141,6 @@ class _MapPageState extends State<MapPage> {
     await _addFrenchCoveragePolygons();
   }
 
-  /// Fetch stops and vehicles from your backend and render on the map.
   Future<void> _fetchAndRender() async {
     if (mapboxMapController == null) return;
 
@@ -147,7 +148,6 @@ class _MapPageState extends State<MapPage> {
     final mode = _modeToString(widget.mode);
 
     try {
-      // Parallel fetch
       final results = await Future.wait([
         _transportClient.fetchStops(city: city, mode: mode),
         _transportClient.fetchVehicles(city: city, mode: mode),
@@ -160,7 +160,6 @@ class _MapPageState extends State<MapPage> {
       await _renderVehiclesGeoJson(vehicles);
     } catch (e, st) {
       debugPrint('Error fetching or rendering transport data: $e\n$st');
-      // no-op; we'll retry on the next poll
     }
   }
 
@@ -231,7 +230,6 @@ class _MapPageState extends State<MapPage> {
     const sourceId = 'vehicles_source';
     const layerId = 'vehicles_circle_layer';
 
-    // Remove existing layer/source if present (safe-guard)
     try {
       await mapboxMapController!.style.removeStyleLayer(layerId);
     } catch (_) {}
@@ -239,7 +237,6 @@ class _MapPageState extends State<MapPage> {
       await mapboxMapController!.style.removeStyleSource(sourceId);
     } catch (_) {}
 
-    // Build GeoJSON
     final features = vehicles.map((v) {
       return {
         "type": "Feature",
@@ -264,7 +261,6 @@ class _MapPageState extends State<MapPage> {
     final source = mp.GeoJsonSource(id: sourceId, data: geojson);
     await mapboxMapController!.style.addSource(source);
 
-    // Use a circle layer to visualize vehicles (simple and performant).
     final circleLayer = mp.CircleLayer(
       id: layerId,
       sourceId: sourceId,
@@ -291,7 +287,6 @@ class _MapPageState extends State<MapPage> {
       const sourceId = 'fr_regions';
       const layerId = 'fr_regions_fill';
 
-      // remove old
       try {
         await mapboxMapController!.style.removeStyleLayer(layerId);
       } catch (_) {}
