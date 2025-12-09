@@ -5,6 +5,7 @@
 //   2) TransitLand (feed / stops discovery) — discover GTFS feeds & stops
 //   3) Nominatim (OpenStreetMap) — geocoding city -> coords
 //   4) Mock generator fallback (if no real data available)
+ 
 
 const axios = require('axios');
 const qs = require('querystring');
